@@ -16,7 +16,7 @@ const Register = () => {
 
   const [uploadPhoto, setUploadPhoto] = useState("");
 
-  console.log(uploadPhoto);
+  // console.log(uploadPhoto);
 
   const handleOnChange = (e) => {
     const { name, value } = e.target
