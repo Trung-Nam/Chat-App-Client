@@ -1,6 +1,9 @@
 import { useState } from "react"
 import { IoCloudUploadOutline } from "react-icons/io5";
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import uploadFile from "../utils/uploadFile";
+import axiosInstance from "../utils/axiosInstance";
+import toast from "react-hot-toast";
 const Register = () => {
   const [data, setData] = useState({
     name: "",
@@ -9,7 +12,11 @@ const Register = () => {
     profile_pic: ""
   })
 
+  const navigate = useNavigate();
+
   const [uploadPhoto, setUploadPhoto] = useState("");
+
+  console.log(uploadPhoto);
 
   const handleOnChange = (e) => {
     const { name, value } = e.target
@@ -22,23 +29,42 @@ const Register = () => {
     })
   }
 
-  const handleUploadPhoto = (e) => {
-    const file = e.target.files[0]
 
-    setUploadPhoto(file)
-  }
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log(data);
-  }
-
+  
+    try {
+      if (uploadPhoto) {
+        const result = await uploadFile(uploadPhoto);
+  
+        if (result) {
+          data.profile_pic = result?.url;
+        }
+      }
+  
+      const response = await axiosInstance.post("/register", data);
+  
+      if (response.data.success) {
+        toast.success(response?.data?.message);
+        setData({
+          name: "",
+          email: "",
+          password: "",
+          profile_pic: ""
+        });
+  
+        navigate('/email');
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message);
+    }
+  };
 
 
   return (
     <div className="mt-5">
-      <div className='bg-white w-full max-w-sm rounded-lg overflow-hidden p-4 py-8 mx-auto mt-20'>
+      <div className='bg-white w-full max-w-md rounded-lg mx-2 overflow-hidden p-4 py-8 md:mx-auto mt-20'>
         <h3 className="flex justify-center items-center text-2xl font-bold">Welcome to Chat app!</h3>
 
         <form className="grid gap-4 mt-5" onSubmit={handleSubmit}>
@@ -49,7 +75,7 @@ const Register = () => {
               id="name"
               name="name"
               placeholder="Enter your name"
-              className="bg-slate-100 px-2 py-2 focus:outline-primary w-full"
+              className="bg-slate-100 px-2 py-3 focus:outline-primary w-full rounded"
               value={data.name}
               onChange={handleOnChange}
               required
@@ -63,7 +89,7 @@ const Register = () => {
               id="email"
               name="email"
               placeholder="Enter your email"
-              className="bg-slate-100 px-2 py-3 focus:outline-primary w-full"
+              className="bg-slate-100 px-2 py-3 focus:outline-primary w-full rounded"
               value={data.email}
               onChange={handleOnChange}
               required
@@ -77,7 +103,7 @@ const Register = () => {
               id="password"
               name="password"
               placeholder="Enter your password"
-              className="bg-slate-100 px-2 py-3 focus:outline-primary w-full"
+              className="bg-slate-100 px-2 py-3 focus:outline-primary w-full rounded"
               value={data.password}
               onChange={handleOnChange}
               required
@@ -110,7 +136,7 @@ const Register = () => {
               id="profile_pic"
               name="profile_pic"
               className="bg-slate-100 px-2 py-3 focus:outline-primary hidden w-full"
-              onChange={handleUploadPhoto}
+              onChange={(e) => setUploadPhoto(e.target.files[0])}
             />
           </div>
 
