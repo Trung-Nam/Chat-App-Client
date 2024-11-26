@@ -5,7 +5,6 @@ import toast from "react-hot-toast";
 import { PiUserCircle } from "react-icons/pi";
 const CheckEmail = () => {
   const [email,setEmail] = useState("");
-  // console.log(email);
   
   const navigate = useNavigate();
 

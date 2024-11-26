@@ -3,16 +3,20 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import axiosInstance from "../utils/axiosInstance";
 import toast from "react-hot-toast";
 import Avatar from "../components/Avatar";
+import { useDispatch } from "react-redux";
+import { setToken } from "../redux/userSlice";
 const CheckPassword = () => {
   const [password, setPassword] = useState("");
 
   const navigate = useNavigate();
-  const location = useLocation()
+  const location = useLocation();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!location?.state?.name) {
       navigate('/email');
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleSubmit = async (e) => {
@@ -33,6 +37,10 @@ const CheckPassword = () => {
 
       if (response.data.success) {
         toast.success(response?.data?.message);
+
+        dispatch(setToken(response?.data?.token));
+        localStorage.setItem('token', response?.data?.token);
+
         setPassword("")
 
         navigate('/');
