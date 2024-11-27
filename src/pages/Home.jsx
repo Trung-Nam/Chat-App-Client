@@ -3,16 +3,17 @@ import axiosInstance from '../utils/axiosInstance';
 import toast from 'react-hot-toast';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { logout, setUser } from '../redux/userSlice';
+import { logout, setOnlineUser, setSocketConnection, setUser } from '../redux/userSlice';
 import Sidebar from '../components/Sidebar';
-
+import io from 'socket.io-client'
 const Home = () => {
   const user = useSelector(state => state.user)
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
-
+  console.log("user",user);
+  
   useEffect(() => {
     fetchUserDetails();
   }, [])
@@ -39,6 +40,29 @@ const Home = () => {
       toast.error(error?.response?.data?.message);
     }
   }
+
+  // Socket connection
+
+  useEffect(()=>{
+    const socketConnection = io(import.meta.env.VITE_BACKEND_URL,{
+      auth : {
+        token : localStorage.getItem('token')
+      },
+    })
+
+    socketConnection.on('onlineUser',(data)=>{
+      console.log(data)
+      dispatch(setOnlineUser(data))
+    })
+
+    dispatch(setSocketConnection(socketConnection))
+
+    return ()=>{
+      socketConnection.disconnect()
+    }
+  },[])
+  
+
 
   const basePath = location.pathname === '/';
 
