@@ -12,8 +12,8 @@ const Home = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  console.log("user",user);
-  
+  console.log("user", user);
+
   useEffect(() => {
     fetchUserDetails();
   }, [])
@@ -43,48 +43,50 @@ const Home = () => {
 
   // Socket connection
 
-  useEffect(()=>{
-    const socketConnection = io(import.meta.env.VITE_BACKEND_URL,{
-      auth : {
-        token : localStorage.getItem('token')
+  useEffect(() => {
+    const socketConnection = io(import.meta.env.VITE_BACKEND_URL, {
+      auth: {
+        token: localStorage.getItem('token')
       },
     })
 
-    socketConnection.on('onlineUser',(data)=>{
+    socketConnection.on('onlineUser', (data) => {
       console.log(data)
       dispatch(setOnlineUser(data))
     })
 
     dispatch(setSocketConnection(socketConnection))
 
-    return ()=>{
+    return () => {
       socketConnection.disconnect()
     }
-  },[])
-  
+  }, [])
+
 
 
   const basePath = location.pathname === '/';
 
   return (
     <div className='grid lg:grid-cols-[300px,1fr] h-screen max-h-screen'>
-      <section className={`bg-white ${basePath && 'hidden'} lg:block`}>
+      <section className={`bg-white ${!basePath && "hidden"} lg:block`}>
         <Sidebar />
       </section>
 
-      <section className={`${basePath && 'hidden'}`}>
+      {/**message component**/}
+      <section className={`${basePath && "hidden"}`} >
         <Outlet />
       </section>
 
-      <div className={`flex-col justify-center items-center gap-2 hidden ${!basePath ? 'hidden' : 'lg:flex'}`}>
+
+      <div className={`justify-center items-center flex-col gap-2 hidden ${!basePath ? "hidden" : "lg:flex"}`}>
         <div>
           <img
-            src={'/assets/logo.png'}
-            alt="logo"
+            src={"/assets/logo.png"}
             width={250}
+            alt='logo'
           />
         </div>
-        <p className='text-lg mt-2 text-slate-500'>Select user to send messages</p>
+        <p className='text-lg mt-2 text-slate-500'>Select user to send message</p>
       </div>
     </div>
   )
