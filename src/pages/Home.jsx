@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import axiosInstance from '../utils/axiosInstance';
 import toast from 'react-hot-toast';
 import { useEffect } from 'react';
@@ -10,8 +10,7 @@ const Home = () => {
   const user = useSelector(state => state.user)
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  console.log("redux user", user);
+  const location = useLocation();
 
 
   useEffect(() => {
@@ -29,7 +28,7 @@ const Home = () => {
 
       dispatch(setUser(response.data.data));
 
-      if (response.data.logout) {
+      if (response.data.data.logout) {
         dispatch(logout());
         navigate('/email');
       }
@@ -41,15 +40,28 @@ const Home = () => {
     }
   }
 
+  const basePath = location.pathname === '/';
+
   return (
     <div className='grid lg:grid-cols-[300px,1fr] h-screen max-h-screen'>
-      <section className='bg-white '>
-        <Sidebar/>
+      <section className={`bg-white ${basePath && 'hidden'} lg:block`}>
+        <Sidebar />
       </section>
 
-      <section>
+      <section className={`${basePath && 'hidden'}`}>
         <Outlet />
       </section>
+
+      <div className={`flex-col justify-center items-center gap-2 hidden ${!basePath ? 'hidden' : 'lg:flex'}`}>
+        <div>
+          <img
+            src={'/assets/logo.png'}
+            alt="logo"
+            width={250}
+          />
+        </div>
+        <p className='text-lg mt-2 text-slate-500'>Select user to send messages</p>
+      </div>
     </div>
   )
 }
