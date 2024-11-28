@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom"
 import Avatar from "./Avatar";
@@ -7,12 +7,17 @@ import { IoClose } from "react-icons/io5"
 import { FaAngleLeft, FaImage, FaPlus, FaVideo } from "react-icons/fa6";
 import uploadFile from "../utils/uploadFile";
 import Loading from "./Loading";
+import { IoSend } from "react-icons/io5";
+import moment from "moment";
 const Message = () => {
   const params = useParams();
   const socketConnection = useSelector(state => state?.user?.socketConnection);
   const user = useSelector(state => state?.user);
   const [openImageVideoUpload, setOpenImageVideoUpload] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [allMessages, setAllMessages] = useState([]);
+  const currentMessage = useRef(null);
+
   const [message, setMessage] = useState({
     text: "",
     imgUrl: "",
@@ -26,12 +31,27 @@ const Message = () => {
     _id: "",
   });
 
+
+  useEffect(() => {
+    if (currentMessage.current) {
+      currentMessage.current.scrollIntoView({ behavior: "smooth", block: "end" });
+    }
+  }, [allMessages])
+
+
+
   useEffect(() => {
     if (socketConnection) {
       socketConnection.emit('message-page', params?.userId);
 
       socketConnection.on('message-user', (data) => {
         setDataUser(data);
+      })
+
+      socketConnection.on('message', (data) => {
+        // console.log(data);
+        setAllMessages(data);
+
       })
     }
   }, [params?.userId, socketConnection, user])
@@ -83,6 +103,42 @@ const Message = () => {
         videoUrl: ""
       }
     })
+  }
+
+
+  const handleOnChange = (e) => {
+    const { name, value } = e.target;
+
+    setMessage((prev) => {
+      return {
+        ...prev,
+        text: value
+      }
+    })
+
+  }
+
+  const handleSendMessage = (e) => {
+    e.preventDefault();
+
+    if (message.text || message.imgUrl || message.videoUrl) {
+      if (socketConnection) {
+        socketConnection.emit('new message', {
+          sender: user?._id,
+          receiver: params.userId,
+          text: message.text,
+          imgUrl: message.imgUrl,
+          videoUrl: message.videoUrl,
+          msgByUserId: user?._id
+        })
+        setMessage({
+          text: "",
+          imgUrl: "",
+          videoUrl: ""
+        })
+
+      }
+    }
   }
 
   return (
@@ -166,7 +222,19 @@ const Message = () => {
           )
         }
 
-        Show all messages
+        {/* All message show here */}
+
+        <div className="flex flex-col gap-2 py-2 mx-2" ref={currentMessage}>
+          {
+            allMessages?.map((msg, index) => (
+              <div key={index} className={`bg-white p-1 py-1 rounded w-fit ${user?._id === msg?.msgByUserId ? "ml-auto bg-teal-100" : ""}`}>
+                <p className="px-2">{msg.text}</p>
+                <p className="text-sm ml-auto w-fit">{moment(msg.createdAt).format('hh:mm')}</p>
+              </div>
+            )
+            )
+          }
+        </div>
       </div>
 
       {/* Send message */}
@@ -213,6 +281,21 @@ const Message = () => {
             )
           }
         </div>
+
+        {/* Input box */}
+        <form className="h-full w-full flex gap-2" onSubmit={handleSendMessage}>
+          <input
+            type="text"
+            placeholder="Type here message..."
+            className="py-1 px-4 outline-none w-full h-full"
+            value={message?.text}
+            onChange={handleOnChange}
+          />
+          <button className="text-primary hover:text-secondary">
+            <IoSend size={25} />
+          </button>
+        </form>
+
       </section>
     </div>
   )
