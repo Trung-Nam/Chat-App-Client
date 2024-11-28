@@ -157,7 +157,7 @@ const Message = () => {
             <Avatar
               width={45}
               height={45}
-              imageUrl={dataUser?.profile_pic}
+              imgUrl={dataUser?.profile_pic}
               name={dataUser?.name}
               userId={dataUser?._id}
             />

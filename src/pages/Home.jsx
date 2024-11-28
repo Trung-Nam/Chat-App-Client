@@ -2,7 +2,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import axiosInstance from '../utils/axiosInstance';
 import toast from 'react-hot-toast';
 import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { logout, setOnlineUser, setSocketConnection, setUser } from '../redux/userSlice';
 import Sidebar from '../components/Sidebar';
 import io from 'socket.io-client'

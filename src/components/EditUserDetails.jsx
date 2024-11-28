@@ -21,7 +21,9 @@ const EditUserDetails = ({ onClose, user }) => {
         setData((prev) => {
             return {
                 ...prev,
-                ...user
+                name: user?.name,
+                profile_pic: user?.profile_pic
+                //...user
             }
         })
     }, [user])
@@ -41,22 +43,22 @@ const EditUserDetails = ({ onClose, user }) => {
     }
 
     const handleOpenUploadPhoto = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault()
+        e.stopPropagation()
 
-        uploadPhotoRef.current.click();
+        uploadPhotoRef.current.click()
     }
 
-    const handleUploadPhoto = async (e) => {
-        const file = e.target.files[0];
+    const handleUploadPhoto = async(e)=>{
+        const file = e.target.files[0]
 
-        const uploadPhoto = await uploadFile(file);
+        const uploadPhoto = await uploadFile(file)
 
-        setData((prev) => {
-            return {
-                ...prev,
-                profile_pic: uploadPhoto?.url
-            }
+        setData((prev)=>{
+        return{
+            ...prev,
+            profile_pic : uploadPhoto?.url
+        }
         })
     }
 
@@ -64,18 +66,16 @@ const EditUserDetails = ({ onClose, user }) => {
         e.preventDefault();
         e.stopPropagation();
         try {
-            // console.log(data);
-
             const response = await axiosInstance({
                 method: 'POST',
-                url:"/update-user", 
-                data:data,
+                url: "/update-user",
+                data: data,
                 withCredentials: true
             });
             // console.log(response);
-            toast.success(response?.data?.message);
             
             if (response.data.success) {
+                toast.success(response?.data?.message);
                 dispatch(setUser(response.data.data));
                 onClose()
             }
