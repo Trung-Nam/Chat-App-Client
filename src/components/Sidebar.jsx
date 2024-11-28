@@ -3,19 +3,22 @@ import { IoChatbubbleEllipses } from "react-icons/io5";
 import { FaUserPlus } from "react-icons/fa";
 import { FiArrowUpLeft } from "react-icons/fi";
 import { BiLogOut } from "react-icons/bi";
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import Avatar from './Avatar';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import EditUserDetails from './EditUserDetails';
 import Divider from './Divider';
 import SearchUser from './SearchUser';
 import { FaImage, FaVideo } from 'react-icons/fa6';
+import { logout } from '../redux/userSlice';
 const Sidebar = () => {
   const user = useSelector(state => state?.user);
   const [editUserOpen, setEditUserOpen] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
   const [openSearchUser, setOpenSearchUser] = useState(false);
   const socketConnection = useSelector(state => state?.user?.socketConnection);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (socketConnection) {
@@ -47,6 +50,12 @@ const Sidebar = () => {
 
   }, [socketConnection, user])
 
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/email");
+    localStorage.clear();
+  }
+
 
   return (
     <div className="w-full h-full grid grid-cols-[48px,1fr] bg-white">
@@ -76,7 +85,7 @@ const Sidebar = () => {
             />
 
           </button>
-          <button title="logout" className="w-12 h-12 flex justify-center items-center cursor-pointer hover:bg-slate-200 rounded">
+          <button onClick={handleLogout} title="logout" className="w-12 h-12 flex justify-center items-center cursor-pointer hover:bg-slate-200 rounded">
             <span className="-ml-2">
               <BiLogOut size={20} />
             </span>
@@ -136,10 +145,15 @@ const Sidebar = () => {
                         )
                       }
                     </div>
-                    <p>{conversation?.lastMsg?.text}</p>
+                    <p className="text-ellipsis line-clamp-1">{conversation?.lastMsg?.text}</p>
                   </div>
                 </div>
-                <p className="text-xs w-6 h-6 flex justify-center items-center ml-auto p-1 bg-primary text-white rounded-full">{conversation?.unseenMsg}</p>
+
+                {
+                  Boolean(conversation?.unseenMsg) && (
+                    <p className="text-xs w-6 h-6 flex justify-center items-center ml-auto p-1 bg-primary text-white rounded-full">{conversation?.unseenMsg}</p>
+                  )
+                }
               </NavLink>
             ))
           }

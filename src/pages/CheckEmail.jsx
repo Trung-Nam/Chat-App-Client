@@ -15,7 +15,7 @@ const CheckEmail = () => {
     try {
       
       const response = await axiosInstance.post("/email", {email: email});
-      console.log(response);
+      // console.log(response);
       
       if (response.data.success) {
         toast.success(response?.data?.message);

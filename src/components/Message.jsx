@@ -45,6 +45,8 @@ const Message = () => {
     if (socketConnection) {
       socketConnection.emit('message-page', params?.userId);
 
+      socketConnection.emit('seen', params?.userId);
+
       socketConnection.on('message-user', (data) => {
         setDataUser(data);
       })
@@ -54,6 +56,8 @@ const Message = () => {
         setAllMessages(data);
 
       })
+
+
     }
   }, [params?.userId, socketConnection, user])
 
@@ -181,7 +185,7 @@ const Message = () => {
         <div className="flex flex-col gap-2 py-2 mx-2" ref={currentMessage}>
           {
             allMessages?.map((msg, index) => (
-              <div key={index} className={`bg-white p-1 py-1 rounded w-fit max-w-[280px] md:max-w-sm lg:max-w-md ${user?._id === msg?.msgByUserId ? "ml-auto bg-teal-100" : ""}`}>
+              <div key={index} className={`p-1 py-1 rounded w-fit max-w-[280px] md:max-w-sm lg:max-w-md ${user?._id === msg?.msgByUserId ? "ml-auto bg-teal-100" : "bg-white"}`}>
                 <div className="w-full">
                   {
                     msg?.imageUrl && (

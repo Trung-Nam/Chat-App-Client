@@ -31,7 +31,7 @@ const SearchUser = ({onClose}) => {
     }, [search])
 
 
-    console.log(searchUsers);
+    // console.log(searchUsers);
     
 
     return (
