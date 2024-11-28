@@ -7,12 +7,12 @@ import { logout, setOnlineUser, setSocketConnection, setUser } from '../redux/us
 import Sidebar from '../components/Sidebar';
 import io from 'socket.io-client'
 const Home = () => {
-  const user = useSelector(state => state.user)
+  // const user = useSelector(state => state.user)
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
 
-  console.log("user", user);
+  // console.log("user", user);
 
   useEffect(() => {
     fetchUserDetails();
@@ -51,7 +51,6 @@ const Home = () => {
     })
 
     socketConnection.on('onlineUser', (data) => {
-      console.log(data)
       dispatch(setOnlineUser(data))
     })
 
